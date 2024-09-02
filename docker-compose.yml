@@ -11,14 +11,14 @@ services:
   #     - db.env
 
   redis:
-    image: redis:5-alpine
+    image: redis:alpine
     restart: always
 
   app:
     image: nextcloud:fpm-alpine
     restart: always
     volumes:
-      - nextcloud:/var/www/html
+      - ./nextcloud:/var/www/html
     environment:
     #   - MYSQL_HOST=db
       - REDIS_HOST=redis
@@ -34,20 +34,26 @@ services:
     ports:
       - 8880:80
     volumes:
-      - nextcloud:/var/www/html:ro
+      - ./nextcloud:/var/www/html:ro
     depends_on:
       - app
+    networks:
+      ncmagoreal_network:
+        ipv4_address: 192.168.192.4
 
   cron:
     image: nextcloud:fpm-alpine
     restart: always
     volumes:
-      - nextcloud:/var/www/html
+      - ./nextcloud:/var/www/html
     entrypoint: /cron.sh
     depends_on:
       # - db
       - redis
 
-volumes:
+# volumes:
   # db:
-  nextcloud:
+  # nextcloud:
+networks:
+  ncmagoreal_network:
+    external: true
